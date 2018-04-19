@@ -3,8 +3,6 @@ import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdDraw;
 
-import java.util.function.DoubleBinaryOperator;
-
 public class KdTree {
 
     private Node rootNode;
