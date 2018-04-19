@@ -2,7 +2,6 @@ import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdDraw;
-import org.w3c.dom.css.Rect;
 
 import java.util.function.DoubleBinaryOperator;
 
@@ -150,6 +149,7 @@ public class KdTree {
         if (p == null) {
             throw new IllegalArgumentException();
         }
-        return null;
+        Point2D result = null;
+        return result;
     }
 }
