@@ -61,6 +61,13 @@ class PointSETTest {
     }
 
     @Test
+    void range_null() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new PointSET().range(null);
+        });
+    }
+
+    @Test
     void range_empty() {
         PointSET pointSET = new PointSET();
         RectHV rectHV = new RectHV(-2, -2, 2, 2);

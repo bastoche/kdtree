@@ -28,6 +28,9 @@ public class PointSET {
     }
 
     public Iterable<Point2D> range(RectHV rect) {
+        if (rect == null) {
+            throw new IllegalArgumentException();
+        }
         Stack<Point2D> stack = new Stack<>();
         for (Point2D point : points) {
             if (rect.contains(point)) {

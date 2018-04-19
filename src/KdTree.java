@@ -139,6 +139,9 @@ public class KdTree {
     }
 
     public Iterable<Point2D> range(RectHV rect) {
+        if (rect == null) {
+            throw new IllegalArgumentException();
+        }
         Stack<Point2D> stack = new Stack<>();
         return stack;
     }

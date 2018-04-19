@@ -69,6 +69,13 @@ class KdTreeTest {
     }
 
     @Test
+    void range_null() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new KdTree().range(null);
+        });
+    }
+
+    @Test
     void range_empty() {
         KdTree kdtree = new KdTree();
         RectHV rectHV = new RectHV(-2, -2, 2, 2);
