@@ -17,8 +17,14 @@ public class Point2D implements Comparable<Point2D> {
         return y;
     }
 
-    //    public  double distanceTo(Point2D that)         // Euclidean distance between two points
-//    public  double distanceSquaredTo(Point2D that)  // square of Euclidean distance between two points
+    public double distanceTo(Point2D that) {
+        return Math.sqrt(distanceSquaredTo(that));
+    }
+
+    public double distanceSquaredTo(Point2D that) {
+        return (x - that.x) * (x - that.x) + (y - that.y) * (y - that.y);
+    }
+
     public int compareTo(Point2D that) {
         return 0;
     }          // for use in an ordered symbol table
