@@ -1,13 +1,64 @@
-public class PointSET {
-    public PointSET() {
-    }                               // construct an empty set of points
-    public           boolean isEmpty() { return true;}                     // is the set empty?
-//    public               int size()                         // number of points in the set
-//    public              void insert(Point2D p)              // add the point to the set (if it is not already in the set)
-//    public           boolean contains(Point2D p)            // does the set contain point p?
-//    public              void draw()                         // draw all points to standard draw
-//    public Iterable<Point2D> range(RectHV rect)             // all points that are inside the rectangle (or on the boundary)
-//    public           Point2D nearest(Point2D p)             // a nearest neighbor in the set to point p; null if the set is empty
+import edu.princeton.cs.algs4.Point2D;
+import edu.princeton.cs.algs4.RectHV;
+import edu.princeton.cs.algs4.SET;
+import edu.princeton.cs.algs4.Stack;
 
-//    public static void main(String[] args)                  // unit testing of the methods (optional)
+public class PointSET {
+
+    private final SET<Point2D> points;
+
+    public PointSET() {
+        points = new SET<>();
+    }
+
+    public boolean isEmpty() {
+        return points.isEmpty();
+    }
+
+    public int size() {
+        return points.size();
+    }
+
+    public void insert(Point2D p) {
+        points.add(p);
+    }
+
+    public boolean contains(Point2D p) {
+        return points.contains(p);
+    }
+
+    public Iterable<Point2D> range(RectHV rect) {
+        Stack<Point2D> stack = new Stack<>();
+        for (Point2D point : points) {
+            if (rect.contains(point)) {
+                stack.push(point);
+            }
+        }
+        return stack;
+    }
+
+    public Point2D nearest(Point2D p) {
+        if (p == null) {
+            throw new IllegalArgumentException();
+        }
+
+        Point2D result = null;
+        double minDistance = Double.MAX_VALUE;
+
+        for (Point2D point : points) {
+            double distance = p.distanceSquaredTo(point);
+            if (distance < minDistance) {
+                minDistance = distance;
+                result = point;
+            }
+
+        }
+        return result;
+    }
+
+    public void draw() {
+        for (Point2D point : points) {
+            point.draw();
+        }
+    }
 }
