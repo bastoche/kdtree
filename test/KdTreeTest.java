@@ -33,6 +33,14 @@ class KdTreeTest {
     }
 
     @Test
+    void size_samePointTwice() {
+        KdTree kdtree = new KdTree();
+        kdtree.insert(new Point2D(0, 0));
+        kdtree.insert(new Point2D(0, 0));
+        assertEquals(1, kdtree.size());
+    }
+
+    @Test
     void insert_null() {
         assertThrows(IllegalArgumentException.class, () -> {
             new KdTree().insert(null);

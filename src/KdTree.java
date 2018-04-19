@@ -1,17 +1,25 @@
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.Stack;
+import edu.princeton.cs.algs4.StdDraw;
+import org.w3c.dom.css.Rect;
+
+import java.util.function.DoubleBinaryOperator;
 
 public class KdTree {
 
     private static class Node {
         final Point2D p;
-        Node lb;
-        Node rt;
+        final RectHV rect;
+
         int size;
 
-        Node(Point2D p, int size) {
+        Node lb;
+        Node rt;
+
+        Node(Point2D p, RectHV rect, int size) {
             this.p = p;
+            this.rect = rect;
             this.size = size;
         }
     }
@@ -42,22 +50,35 @@ public class KdTree {
             throw new IllegalArgumentException();
         }
 
-        rootNode = insert(rootNode, p, true);
+        rootNode = insert(rootNode, p, new RectHV(0, 0, 1, 1), true);
     }
 
-    private Node insert(Node node, Point2D p, boolean useX) {
+    private Node insert(Node node, Point2D p, RectHV rect, boolean useX) {
         if (node == null) {
-            return new Node(p, 1);
+            return new Node(p, rect, 1);
         }
 
+        if (node.p.equals(p)) {
+            return node;
+        }
+
+        double limit = useX ? node.p.x() : node.p.y();
         if (isSmaller(p, node.p, useX)) {
-            node.lb = insert(node.lb, p, !useX);
+            node.lb = insert(node.lb, p, cut(rect, limit, useX, Math::min), !useX);
         } else {
-            node.rt = insert(node.rt, p, !useX);
+            node.rt = insert(node.rt, p, cut(rect, limit, useX, Math::max), !useX);
         }
 
         node.size = 1 + size(node.lb) + size(node.rt);
         return node;
+    }
+
+    private RectHV cut(RectHV rect, double at, boolean useX, DoubleBinaryOperator operator) {
+        if (useX) {
+            return new RectHV(operator.applyAsDouble(rect.xmin(), at), rect.ymin(), operator.applyAsDouble(rect.xmax(), at), rect.ymax());
+        } else {
+            return new RectHV(rect.xmin(), operator.applyAsDouble(rect.ymin(), at), rect.xmax(), operator.applyAsDouble(rect.ymax(), at));
+        }
     }
 
     public boolean contains(Point2D p) {
@@ -78,8 +99,7 @@ public class KdTree {
 
         if (isSmaller(p, node.p, useX)) {
             return contains(node.lb, p, !useX);
-        }
-        else {
+        } else {
             return contains(node.rt, p, !useX);
         }
     }
@@ -89,10 +109,33 @@ public class KdTree {
             return p2.x() - p1.x() > 0;
         }
         return p2.y() - p1.y() > 0;
-
     }
 
+
     public void draw() {
+        draw(rootNode, true);
+    }
+
+    private void draw(Node node, boolean useX) {
+        if (node == null) {
+            return;
+        }
+
+        StdDraw.setPenColor(StdDraw.BLACK);
+        StdDraw.setPenRadius(0.01);
+        node.p.draw();
+
+        StdDraw.setPenColor(useX ? StdDraw.RED : StdDraw.BLUE);
+        StdDraw.setPenRadius();
+
+        if (useX) {
+            StdDraw.line(node.p.x(), node.rect.ymin(), node.p.x(), node.rect.ymax());
+        } else {
+            StdDraw.line(node.rect.xmin(), node.p.y(), node.rect.xmax(), node.p.y());
+        }
+
+        draw(node.lb, !useX);
+        draw(node.rt, !useX);
     }
 
     public Iterable<Point2D> range(RectHV rect) {
