@@ -169,10 +169,10 @@ public class KdTree {
         if (p == null) {
             throw new IllegalArgumentException();
         }
-        return nearest(null, rootNode, p);
+        return nearest(null, rootNode, p, true);
     }
 
-    private Point2D nearest(Point2D result, Node node, Point2D p) {
+    private Point2D nearest(Point2D result, Node node, Point2D p, boolean useX) {
         if (node == null) {
             return result;
         }
@@ -188,11 +188,15 @@ public class KdTree {
         }
 
         // check recursively
-        // TODO choose subtree more wisely
-        result = nearest(result, node.lb, p);
-        result = nearest(result, node.rt, p);
+        if ((useX && p.x() < node.p.x()) || (!useX && p.y() < node.p.y())) {
+            result = nearest(result, node.lb, p, !useX);
+            result = nearest(result, node.rt, p, !useX);
+        }
+        else {
+            result = nearest(result, node.rt, p, !useX);
+            result = nearest(result, node.lb, p, !useX);
+        }
 
         return result;
-
     }
 }
