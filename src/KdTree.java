@@ -7,6 +7,8 @@ import java.util.function.DoubleBinaryOperator;
 
 public class KdTree {
 
+    private Node rootNode;
+
     private static class Node {
         final Point2D p;
         final RectHV rect;
@@ -22,8 +24,6 @@ public class KdTree {
             this.size = size;
         }
     }
-
-    private Node rootNode;
 
 
     public KdTree() {
@@ -63,20 +63,28 @@ public class KdTree {
 
         double limit = useX ? node.p.x() : node.p.y();
         if (isSmaller(p, node.p, useX)) {
-            node.lb = insert(node.lb, p, cut(rect, limit, useX, Math::min), !useX);
+            node.lb = insert(node.lb, p, cutMin(rect, limit, useX), !useX);
         } else {
-            node.rt = insert(node.rt, p, cut(rect, limit, useX, Math::max), !useX);
+            node.rt = insert(node.rt, p, cutMax(rect, limit, useX), !useX);
         }
 
         node.size = 1 + size(node.lb) + size(node.rt);
         return node;
     }
 
-    private RectHV cut(RectHV rect, double at, boolean useX, DoubleBinaryOperator operator) {
+    private RectHV cutMin(RectHV rect, double at, boolean useX) {
         if (useX) {
-            return new RectHV(operator.applyAsDouble(rect.xmin(), at), rect.ymin(), operator.applyAsDouble(rect.xmax(), at), rect.ymax());
+            return new RectHV(Math.min(rect.xmin(), at), rect.ymin(), Math.min(rect.xmax(), at), rect.ymax());
         } else {
-            return new RectHV(rect.xmin(), operator.applyAsDouble(rect.ymin(), at), rect.xmax(), operator.applyAsDouble(rect.ymax(), at));
+            return new RectHV(rect.xmin(), Math.min(rect.ymin(), at), rect.xmax(), Math.min(rect.ymax(), at));
+        }
+    }
+
+    private RectHV cutMax(RectHV rect, double at, boolean useX) {
+        if (useX) {
+            return new RectHV(Math.max(rect.xmin(), at), rect.ymin(), Math.max(rect.xmax(), at), rect.ymax());
+        } else {
+            return new RectHV(rect.xmin(), Math.max(rect.ymin(), at), rect.xmax(), Math.max(rect.ymax(), at));
         }
     }
 
@@ -142,14 +150,51 @@ public class KdTree {
             throw new IllegalArgumentException();
         }
         Stack<Point2D> stack = new Stack<>();
+        range(stack, rootNode, rect);
         return stack;
+    }
+
+    private void range(Stack<Point2D> result, Node node, RectHV rect) {
+        if (node == null) {
+            return;
+        }
+        if (rect.intersects(node.rect)) {
+            if (rect.contains(node.p)) {
+                result.push(node.p);
+            }
+            range(result, node.lb, rect);
+            range(result, node.rt, rect);
+        }
     }
 
     public Point2D nearest(Point2D p) {
         if (p == null) {
             throw new IllegalArgumentException();
         }
-        Point2D result = null;
+        return nearest(null, rootNode, p);
+    }
+
+    private Point2D nearest(Point2D result, Node node, Point2D p) {
+        if (node == null) {
+            return result;
+        }
+
+        // pruning rule
+        if (result != null && result.distanceSquaredTo(p) < node.rect.distanceSquaredTo(p)) {
+            return result;
+        }
+
+        // check node point
+        if (result == null || node.p.distanceSquaredTo(p) < result.distanceSquaredTo(p)) {
+            result = node.p;
+        }
+
+        // check recursively
+        // TODO choose subtree more wisely
+        result = nearest(result, node.lb, p);
+        result = nearest(result, node.rt, p);
+
         return result;
+
     }
 }

@@ -46,7 +46,7 @@ public class PointSET {
         }
 
         Point2D result = null;
-        double minDistance = Double.MAX_VALUE;
+        double minDistance = Double.POSITIVE_INFINITY;
 
         for (Point2D point : points) {
             double distance = p.distanceSquaredTo(point);
